@@ -1,6 +1,5 @@
 ﻿"use client";
 
-import { FormEvent, useMemo, useState } from "react";
 import { m } from "framer-motion";
 import { MagneticButton } from "@/components/magnetic";
 
@@ -11,63 +10,7 @@ const budgetOptions = [
   "$100k+"
 ];
 
-function encode(data: Record<string, string>) {
-  return Object.keys(data)
-    .map(
-      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key] ?? "")}`
-    )
-    .join("&");
-}
-
 export default function Contact() {
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    company: "",
-    budget: "",
-    message: ""
-  });
-
-  const isValid = useMemo(() => {
-    return (
-      formData.name.trim().length > 1 &&
-      formData.email.includes("@") &&
-      formData.message.trim().length > 10
-    );
-  }, [formData.email, formData.message, formData.name]);
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-
-    if (!isValid) {
-      setStatus("error");
-      setError("Please complete the required fields with valid details.");
-      return;
-    }
-
-    try {
-      const body = encode({
-        "form-name": "contact",
-        ...formData
-      });
-
-      const response = await fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body
-      });
-
-      if (!response.ok) throw new Error("Failed");
-      setStatus("success");
-    } catch (err) {
-      setStatus("error");
-      setError("Something went wrong. Please try again or email us directly.");
-    }
-  };
-
   return (
     <section id="inquiry" className="relative px-6 py-24 md:px-12 lg:px-20">
       <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
@@ -112,7 +55,6 @@ export default function Contact() {
             method="POST"
             data-netlify="true"
             data-netlify-honeypot="bot-field"
-            onSubmit={handleSubmit}
             className="relative space-y-4"
           >
             <input type="hidden" name="form-name" value="contact" />
@@ -124,13 +66,6 @@ export default function Contact() {
               <label className="text-xs uppercase tracking-[0.3em] text-muted">
                 Name
                 <input
-                  value={formData.name}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      name: event.target.value
-                    }))
-                  }
                   required
                   name="name"
                   autoComplete="name"
@@ -142,13 +77,6 @@ export default function Contact() {
               <label className="text-xs uppercase tracking-[0.3em] text-muted">
                 Email
                 <input
-                  value={formData.email}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      email: event.target.value
-                    }))
-                  }
                   required
                   name="email"
                   autoComplete="email"
@@ -163,13 +91,6 @@ export default function Contact() {
               <label className="text-xs uppercase tracking-[0.3em] text-muted">
                 Company
                 <input
-                  value={formData.company}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      company: event.target.value
-                    }))
-                  }
                   name="company"
                   autoComplete="organization"
                   className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-text backdrop-blur"
@@ -180,13 +101,6 @@ export default function Contact() {
               <label className="text-xs uppercase tracking-[0.3em] text-muted">
                 Budget
                 <select
-                  value={formData.budget}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      budget: event.target.value
-                    }))
-                  }
                   name="budget"
                   className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-text backdrop-blur"
                 >
@@ -203,13 +117,6 @@ export default function Contact() {
             <label className="text-xs uppercase tracking-[0.3em] text-muted">
               Project vision
               <textarea
-                value={formData.message}
-                onChange={(event) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    message: event.target.value
-                  }))
-                }
                 required
                 name="message"
                 rows={5}
@@ -226,19 +133,8 @@ export default function Contact() {
                 Request alignment
               </MagneticButton>
               <span className="text-xs uppercase tracking-[0.3em] text-muted">
-                Form goes directly to Netlify
+                Managed by Netlify Forms
               </span>
-            </div>
-
-            <div
-              aria-live="polite"
-              className={`text-sm ${
-                status === "error" ? "text-accent" : "text-muted"
-              }`}
-            >
-              {status === "success" &&
-                "Your inquiry has been received. We will reply within 48 hours."}
-              {status === "error" && error}
             </div>
           </form>
         </m.div>
